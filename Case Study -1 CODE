@@ -1,7 +1,3 @@
-// Akamai CDN Edge Cache Lookup Optimization using Splay Tree
-// Case Study – DSA-2
-// Student: Y. Yashwanth
-
 class SplayTree {
 
     // Node structure
