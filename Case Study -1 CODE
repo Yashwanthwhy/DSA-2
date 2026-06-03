@@ -1,0 +1,156 @@
+// Akamai CDN Edge Cache Lookup Optimization using Splay Tree
+// Case Study – DSA-2
+// Student: Y. Yashwanth
+
+class SplayTree {
+
+    // Node structure
+    static class Node {
+        int key;
+        Node left, right;
+
+        Node(int key) {
+            this.key = key;
+        }
+    }
+
+    private Node root;
+
+    /* ========================
+       BST INSERT (NO SPLAYING)
+       ======================== */
+    public void insert(int key) {
+        root = insertBST(root, key);
+    }
+
+    private Node insertBST(Node node, int key) {
+        if (node == null)
+            return new Node(key);
+
+        if (key < node.key)
+            node.left = insertBST(node.left, key);
+        else if (key > node.key)
+            node.right = insertBST(node.right, key);
+
+        return node;
+    }
+
+    /* ========================
+       RIGHT ROTATION
+       ======================== */
+    private Node rightRotate(Node x) {
+        Node y = x.left;
+        x.left = y.right;
+        y.right = x;
+        return y;
+    }
+
+    /* ========================
+       LEFT ROTATION
+       ======================== */
+    private Node leftRotate(Node x) {
+        Node y = x.right;
+        x.right = y.left;
+        y.left = x;
+        return y;
+    }
+
+    /* ========================
+       SPLAY OPERATION
+       ======================== */
+    private Node splay(Node root, int key) {
+        if (root == null || root.key == key)
+            return root;
+
+        // Key lies in left subtree
+        if (key < root.key) {
+            if (root.left == null)
+                return root;
+
+            // Zig-Zig (Left Left)
+            if (key < root.left.key) {
+                root.left.left = splay(root.left.left, key);
+                root = rightRotate(root);
+            }
+            // Zig-Zag (Left Right)
+            else if (key > root.left.key) {
+                root.left.right = splay(root.left.right, key);
+                if (root.left.right != null)
+                    root.left = leftRotate(root.left);
+            }
+
+            return (root.left == null) ? root : rightRotate(root);
+        }
+        // Key lies in right subtree
+        else {
+            if (root.right == null)
+                return root;
+
+            // Zig-Zig (Right Right)
+            if (key > root.right.key) {
+                root.right.right = splay(root.right.right, key);
+                root = leftRotate(root);
+            }
+            // Zig-Zag (Right Left)
+            else if (key < root.right.key) {
+                root.right.left = splay(root.right.left, key);
+                if (root.right.left != null)
+                    root.right = rightRotate(root.right);
+            }
+
+            return (root.right == null) ? root : leftRotate(root);
+        }
+    }
+
+    /* ========================
+       ACCESS (SEARCH + SPLAY)
+       ======================== */
+    public void access(int key) {
+        root = splay(root, key);
+        System.out.println("Accessed: " + key + " | New Root: " + root.key);
+    }
+
+    /* ========================
+       INORDER TRAVERSAL
+       ======================== */
+    public void inorder() {
+        inorder(root);
+        System.out.println();
+    }
+
+    private void inorder(Node node) {
+        if (node != null) {
+            inorder(node.left);
+            System.out.print(node.key + " ");
+            inorder(node.right);
+        }
+    }
+
+    /* ========================
+       MAIN – CASE STUDY TRACE
+       ======================== */
+    public static void main(String[] args) {
+
+        SplayTree tree = new SplayTree();
+
+        // Initial BST construction (NO splaying)
+        int[] keys = {30, 15, 50, 10, 20, 40, 60, 5, 25};
+        for (int key : keys) {
+            tree.insert(key);
+        }
+
+        System.out.println("Initial BST (Inorder):");
+        tree.inorder();
+
+        // Access sequence (hot keys)
+        int[] accessSeq = {40, 5, 40, 25, 5, 40, 5};
+
+        System.out.println("\nSplay Operations Trace:");
+        for (int key : accessSeq) {
+            tree.access(key);
+        }
+
+        System.out.println("\nFinal Tree (Inorder):");
+        tree.inorder();
+    }
+}
