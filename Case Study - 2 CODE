@@ -1,7 +1,3 @@
-// Case Study 2: Wavelet Tree for Genomic Range-Rank Queries
-// Subject: DSA-2
-// Student: Y. Yashwanth
-
 public class WaveletTreeDNA {
 
     // Root level bit-vector: 0 -> {A, C}, 1 -> {G, T}
